@@ -1,7 +1,7 @@
 $(document).ready();
 
 var goodSelect, badSelect, goodPicked, badPicked, gameOver, fightStart, AP, HP, CAP, power,
-    fighterArray, Cloud, Barret, Tifa, Aeris, Cactuar, Sephiroth, Malboro
+    fighterArray, Cloud, Barret, Tifa, Aeris, Cactuar, Sephiroth, Malboro, remainingDefenders
 
 // fighter = {
 //     attack: function() {
@@ -14,7 +14,8 @@ var goodSelect, badSelect, goodPicked, badPicked, gameOver, fightStart, AP, HP, 
 //     },
 // }
 
-function FighterConstructor(attackPower, healthPoints, counterAttackPower){
+function FighterConstructor(name, attackPower, healthPoints, counterAttackPower){
+    this.name = name;
     this.AP = attackPower/2;
     this.HP =  healthPoints;
     this.CAP =  counterAttackPower;
@@ -39,37 +40,46 @@ game = {
         badPicked = false;
         gameOver = false;
         fightStart = false;
-        Cloud = new FighterConstructor(50, 150, 0);
-        Barret = new FighterConstructor(50, 180, 0);
-        Tifa = new FighterConstructor(50, 120, 0);
-        Aeris = new FighterConstructor(50, 100, 0);
-        Cactuar = new FighterConstructor(0, 100, 5);
-        Sephiroth = new FighterConstructor(0, 150, 10);
-        Malboro = new FighterConstructor(0, 180, 15);
+        Cloud = new FighterConstructor('cloud', 50, 150, 0);
+        Barret = new FighterConstructor('barret', 50, 180, 0);
+        Tifa = new FighterConstructor('tifa', 50, 120, 0);
+        Aeris = new FighterConstructor('aeris', 50, 100, 0);
+        Cactuar = new FighterConstructor('cactuar', 0, 100, 5);
+        Sephiroth = new FighterConstructor('sephiroth', 0, 150, 10);
+        Malboro = new FighterConstructor('malboro', 0, 180, 15);
         fighterArray = [Cloud, Barret, Tifa, Aeris, Cactuar, Sephiroth, Malboro];
-
+        remainingDefenders = 3;
     },
 
     characterSelect: function(obj){
         if(goodPicked === false){
-            goodSelect = obj.id;
+
             goodPicked = true
-            console.log('good guy: ' + goodSelect);
+            for(var i in fighterArray){
+                if(obj.id === fighterArray[i].name){
+                    goodSelect = fighterArray[i];
+                }
+            }
+            console.log('good guy: ' + goodSelect.name);
 
             $("#goodSelect").hide();
 
-            $(obj).clone().appendTo('#battleground');
+            $(obj).clone().attr('id', 'attacker').appendTo('#battleground');
             $(obj).css('float', 'left');
             $('#badSelect').css('visibility','visible');
+
         }  else if(badPicked === false && goodPicked === true){
-            
-            badSelect = obj.id;
             badPicked = true;
-            console.log('bad guy: '+badSelect);
+            for(var i in fighterArray){
+                if(obj.id === fighterArray[i].name){
+                    badSelect = fighterArray[i];
+                }
+            }
+            console.log('bad guy: '+ badSelect.name);
 
             $("#badSelect").hide();
-            
-            $(obj).clone().appendTo('#battleground');
+
+            $(obj).clone().attr('id', 'defender').appendTo('#battleground');
             $(obj).css('float', 'right');
 
             game.fightStart();
@@ -86,8 +96,31 @@ game = {
 
     attack: function(){
         if(badPicked === true && gameOver === false){
+            goodSelect.attack()
+            badSelect.defend(goodSelect.AP);
+            goodSelect.defend(badSelect.CAP);
+            console.log('update stats');
+            game.updateStats;
             
+            if(badSelect.HP < 1 && remainingDefenders > 0){
+                $('#defender').remove();
+                $('#' + badSelect.name).remove();
+                $("#badSelect").show();
+                badPicked = false;
+                remainingDefenders--
+            } else if(badSelect.HP < 1 && remainingDefenders < 1){
+                game.Win();
+            }
         }
+    },
+    
+    win: function(){
+
+    },
+
+    updateStats: function(){
+        $('#defender > .badFighterHP').text('Atk: ' + badSelect.CAP + ' | HP: ' + badSelect.HP);
+        $('#attacker > .goodFighterHP').text('Atk: ' + goodSelect.AP + ' | HP: ' + goodSelect.HP);
     }
 }
 
