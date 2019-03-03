@@ -5,11 +5,13 @@ body{
 }
 
 h1{
+    font-family: 'Spectral', serif;
     font-weight: 900;
     font-size: 30px;
 }
 
 h2{
+    font-family: 'Spectral', serif;
     font-weight: 900;
     font-size: 20px;
 }
@@ -27,8 +29,8 @@ h2{
     visibility: hidden;
 }
 
-.arena{
-    
+#battle-begin{
+    visibility: hidden;
 }
 
 .goodGuy{
@@ -67,4 +69,20 @@ p{
     height:auto;
     width:auto;
 
+}
+
+#attack{
+    visibility: hidden;
+}
+
+#dialogue{
+    font-family: 'Spectral', serif;
+    display: none;
+    font-size: 200px;
+    color: yellow;
+    font-weight: 900px;
+}
+
+#retry{
+    visibility: hidden;
 }

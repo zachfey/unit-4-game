@@ -40,22 +40,29 @@ game = {
         badPicked = false;
         gameOver = false;
         fightStart = false;
-        Cloud = new FighterConstructor('cloud', 50, 150, 0);
-        Barret = new FighterConstructor('barret', 50, 180, 0);
-        Tifa = new FighterConstructor('tifa', 50, 120, 0);
-        Aeris = new FighterConstructor('aeris', 50, 100, 0);
-        Cactuar = new FighterConstructor('cactuar', 0, 100, 20);
-        Sephiroth = new FighterConstructor('sephiroth', 0, 150, 30);
-        Malboro = new FighterConstructor('malboro', 0, 180, 45);
+        Cloud = new FighterConstructor('cloud', 20, 150, 0);
+        Barret = new FighterConstructor('barret', 10, 180, 0);
+        Tifa = new FighterConstructor('tifa', 30, 120, 0);
+        Aeris = new FighterConstructor('aeris', 40, 100, 0);
+        Cactuar = new FighterConstructor('cactuar', 0, 80, 5);
+        Sephiroth = new FighterConstructor('sephiroth', 0, 120, 25);
+        Malboro = new FighterConstructor('malboro', 0, 180, 60);
         fighterArray = [Cloud, Barret, Tifa, Aeris, Cactuar, Sephiroth, Malboro];
         remainingDefenders = 3;
         for(var i in fighterArray){
             if(fighterArray[i].AP === 0){
                 $('#' + fighterArray[i].name + ' > .fighterStats').text('Atk: ' + fighterArray[i].CAP + ' | HP: ' + fighterArray[i].HP);
+                // $('#' + fighterArray[i].name).show();
             } else{
                 $('#' + fighterArray[i].name + ' > .fighterStats').text('Atk: ' + fighterArray[i].AP + ' | HP: ' + fighterArray[i].HP);
             }
+
         }
+        // $('#goodSelect').show()
+        // $('#badSelect').css('visibility', 'hidden')
+        // $('#retry').css('visibility', 'hidden')
+        // $('#dialogue').hide()
+        // $('#attack').show();
     },
 
     characterSelect: function(obj){
@@ -68,12 +75,11 @@ game = {
                 }
             }
             console.log('good guy: ' + goodSelect.name);
-
             $("#goodSelect").hide();
-
             $(obj).clone().attr('id', 'attacker').appendTo('#battleground');
             $(obj).css('float', 'left');
-            $('#badSelect').css('visibility','visible');
+            $('#badSelect').css('visibility', 'visible');
+            // $('#badSelect').show();
 
         }  else if(badPicked === false && goodPicked === true){
             badPicked = true;
@@ -84,19 +90,18 @@ game = {
             }
             console.log('bad guy: '+ badSelect.name);
 
-            $("#badSelect").hide();
-
+            $("#badSelect").css('visibility', 'hidden');
             $(obj).clone().attr('id', 'defender').appendTo('#battleground');
             $(obj).css('float', 'right');
-
             game.fightStart();
         }
     },
 
     fightStart: function(){
-        $('body').css('background-image','url(assets/images/backgroundSelected.jpg)');
-        $('.arena').css('margin-top', '200px');
-        $("h1").hide();
+        $('#attack').css('visibility', 'visible');
+        // $('body').css('background-image','url(assets/images/backgroundSelected.jpg)');
+        $('#battle-begin').css('visibility', 'visible');
+        $("#main-title").hide();
         fightStart = true;
         console.log('fight has started')
     },
@@ -111,13 +116,10 @@ game = {
             
             if(game.battleStatus() === 'defenderDied'){
                 game.defenderDefeated();
-                $("#badSelect").show();
-                badPicked = false;
-                remainingDefenders--
             } else if(game.battleStatus() === 'won'){
                 game.win();
             } else if(game.battleStatus() === 'lost'){
-                game. playerDefeated();
+                game.lost();
             } else if(game.battleStatus() === 'draw'){
                 game.draw();
             }
@@ -140,31 +142,64 @@ game = {
         }  else if(goodSelect.HP < 1 && badSelect.HP > 1){
             console.log('lost');
             return 'lost';
+        } else if(goodSelect.HP < 1 && badSelect.HP < 1 && remainingDefenders > 1){
+            console.log('lost');
+            return 'lost';
         }
     },
     
     win: function(){
+        gameOver = true;
+        game.playerDefeated();
         game.defenderDefeated();
+        $('#dialogue').text("Victory!")
+        $('#dialogue').css('display', 'block');
+        $('#battle-begin').hide();
+        $('#attack').hide();
+        $('.character-select').hide();
+        $('#retry').css('visibility', 'visible')
     },
 
     lost: function(){
-    
+        gameOver = true;
+        game.playerDefeated();
+        $('#dialogue').text("Failure!")
+        $('#dialogue').css('display', 'block');
+        $('#dialogue').css('color', 'red');
+        $('#battle-begin').hide();
+        $('#attack').hide();
+        $("#badSelect").css('visibility', 'visible');
+        $("#badSelect h2").css('visibility', 'hidden');
+        $('#' + badSelect.name).remove();
+        $('#retry').css('visibility', 'visible')
     },
 
     draw: function(){
+        gameOver = true;
         game.playerDefeated();
         game.defenderDefeated();
+        $('#dialogue').text("Draw!")
+        $('#dialogue').css('display', 'block');
+        $('#battle-begin').hide();
+        $('#attack').hide();
+        $('.character-select').hide();
+        $('#retry').css('visibility', 'visible')
     },
 
     playerDefeated(){
         $('#attacker').remove();
-        $('body').css('background-image','url(assets/images/backgroundSelecting.jpg)');       
+        // $('body').css('background-image','url(assets/images/backgroundSelecting.jpg)');       
     },
 
     defenderDefeated(){
         $('#defender').remove();
-        $('#' + badSelect.name).remove();
-        $('body').css('background-image','url(assets/images/backgroundSelecting.jpg)');
+        $('#' + badSelect.name).hide();
+        if(!gameOver){
+            $("#badSelect").css('visibility', 'visible');
+            badPicked = false;
+            remainingDefenders--
+        }
+        // $('body').css('background-image','url(assets/images/backgroundSelecting.jpg)');
     },
 
     updateStats: function(){
@@ -182,3 +217,7 @@ $('.goodGuy').on('click', function(){game.characterSelect(this);}); //if a good 
 $('.badGuy').on('click', function(){game.characterSelect(this);}); //if a good guy is clicked, check if good guy and bad guy have been picked yet, and hide enemy select
 
 $('#attack').on('click', function(){game.attack();});
+
+$('#retry').on('click', function(){
+    location.reload();
+});

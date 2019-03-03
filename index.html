@@ -6,11 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" type="text/css" href="assets/css/reset.css"/>
     <link rel="stylesheet" type="text/css" href="assets/css/style.css"/>
+    <link href="https://fonts.googleapis.com/css?family=Spectral:800" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <title>Final Fantasy Knockoff!</title>
 </head>
 <body>
-    <header><h1>Final Fantasy Knockoff!</h1> </header>
+    <header><h1 id="main-title">Final Fantasy Knockoff!</h1> </header>
     <main>
         <div class = "character-select" id = "goodSelect">
             <h2>Choose your fighter!</h2>
@@ -56,9 +57,11 @@
         </div>
 
         <div class = "arena">
+            <h1 id="battle-begin">LET THE BATTLE BEGIN!</h1>
             <button id="attack">Attack!</button>
             <div id="battleground"></div>
             <p id="dialogue"></p>
+            <button id = 'retry'>Play Again?</button>
         </div>
 
     </main>
